@@ -3,7 +3,7 @@ package org.example.test.wordCount
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
-object Spark02_WordCount {
+object Spark03_WordCount {
   def main(args: Array[String]): Unit = {
 
     // 建立和Spark框架连接
@@ -27,25 +27,10 @@ object Spark02_WordCount {
     )
     // (hello, 1)
 
+    //相同的Key的数据，可以对Value进行reduce聚合
+    val wordToCount = wordToOne.reduceByKey(_+_)
 
-    // 3. 根据单词进行分组便于统计
-    // (hello, hello， hello), (world, world)
-    val wordGroup: RDD[(String, Iterable[(String, Int)])] = wordToOne.groupBy(
-      t => t._1
-    )
 
-    // 4. 对分组数据进行转换
-    // (hello, 3), (world, 2)
-    val wordToCount = wordGroup.map {
-      case (word, list) => {
-
-        list.reduce(
-          (t1, t2) => {
-            (t1._1, t1._2 + t2._2)
-          }
-        )
-      }
-    }
 
     // 5. 结果打印
     val array: Array[(String, Int)] = wordToCount.collect()
